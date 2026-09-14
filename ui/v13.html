@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Hualuo RepoTool · UI v13（对照 Agora 应用补全 · 全跳转修复）</title>
+<title>Hualuo RepoTool · UI v13.1（全跳转修复 · 全交互真实可用）</title>
 <style>
 :root{--bg:#f3f4f6;--card:#fff;--ink:#17181a;--sub:#7d8590;--line:#eceef2;--acc:#0a5cff;--ok:#16a34a;--warn:#f59e0b;--red:#e5484d}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -130,12 +130,21 @@ nav a.on{color:var(--acc)}nav a.on i{filter:none;opacity:1}
 input[type=range]{margin-left:auto;width:150px;accent-color:var(--acc)}
 .errbar{position:absolute;top:0;left:0;right:0;background:var(--red);color:#fff;font-size:12.5px;padding:8px 14px;z-index:60;display:none}
 .errbar.on{display:block}
+.toast{position:absolute;left:50%;bottom:128px;transform:translateX(-50%);background:#22262b;color:#fff;font-size:12.5px;border-radius:18px;padding:8px 16px;opacity:0;pointer-events:none;transition:.2s;z-index:55;max-width:82%;text-align:center}
+.toast.on{opacity:1}
+.thinkbody,.dropbody{font-size:12.5px;color:var(--sub);background:#fafbfc;border:1px dashed var(--line);border-radius:10px;padding:8px 10px;margin-top:6px}
+.thinkbody.off,.dropbody.off{display:none}
+input.dsearch{width:100%;border:none;outline:none;color:var(--ink);-webkit-appearance:none}
+input.dsearch::placeholder{color:var(--sub)}
+.lrow[data-task]{cursor:pointer}
+.mrow.dis{opacity:.45}
 </style>
 </head>
 <body>
-<h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Hualuo UI v13 手机界面原型</h1>
+<h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Hualuo UI v13.1 手机界面原型</h1>
 <div class="ph">
   <div class="errbar" id="errbar"></div>
+  <div class="toast" id="toast"></div>
   <header><button class="ib" id="drawerBtn">☰</button><div class="t" id="pageTitle">回合流</div><div class="ctx">ctx <b>21.4k</b>/1M · 发 <b>856</b></div></header>
   <main>
     <div class="page on" id="p-chat">
@@ -157,8 +166,8 @@ input[type=range]{margin-left:auto;width:150px;accent-color:var(--acc)}
     <div class="page" id="p-task">
       <div class="grid2"><div class="card"><div class="lbl">运行中</div><div class="big">2</div></div><div class="card"><div class="lbl">今日完成</div><div class="big">7</div></div></div>
       <div class="card"><h5>定时任务</h5>
-        <div class="lrow"><span class="dot g"></span>夜间备份导出<span class="v">02:00 · 下次 17h</span><span class="chev">›</span></div>
-        <div class="lrow"><span class="dot y"></span>仓库巡检 CI<span class="v">每 6h · 暂停</span><span class="chev">›</span></div></div>
+        <div class="lrow" data-task="夜间备份导出" data-st="启用 · 02:00" data-last="今天 02:00 · 成功" data-note="每次执行开新会话，跑完留完整现场"><span class="dot g"></span>夜间备份导出<span class="v">02:00 · 下次 17h</span><span class="chev">›</span></div>
+        <div class="lrow" data-task="仓库巡检 CI" data-st="暂停" data-last="09-13 18:00 · 手动暂停" data-note="每 6 小时查一次 CI，失败才通知；恢复要手动"><span class="dot y"></span>仓库巡检 CI<span class="v">每 6h · 暂停</span><span class="chev">›</span></div></div>
     </div>
     <div class="page" id="p-tool">
       <div class="card"><h5>四态分列：注册 / 接线 / 开关 / 可执行</h5>
@@ -188,7 +197,7 @@ input[type=range]{margin-left:auto;width:150px;accent-color:var(--acc)}
       <button class="pill" id="toolBtn">⋮ 工具</button>
       <button class="pill" id="micBtn">&#127908;</button>
       <button class="send" id="send">➤</button>
-      <div class="addmenu" id="addmenu"><div>&#128444; 照片</div><div>&#127916; 视频（自动抽帧）</div><div>&#128206; 文件（PDF 选页）</div></div>
+      <div class="addmenu" id="addmenu"><div data-a="照片" data-i="&#128444;">&#128444; 照片</div><div data-a="视频" data-i="&#127916;">&#127916; 视频（自动抽帧）</div><div data-a="文件" data-i="&#128206;">&#128206; 文件（PDF 选页）</div></div>
     </div>
   </div>
   <nav id="tabs">
@@ -196,7 +205,7 @@ input[type=range]{margin-left:auto;width:150px;accent-color:var(--acc)}
   </nav>
   <div class="mask" id="mask"></div>
   <div class="drawer" id="drawer">
-    <div class="dsearch">&#128269; 搜索会话与消息…</div>
+    <input class="dsearch" id="dsearch" placeholder="&#128269; 搜索会话与消息…">
     <div class="dhead"><b>会话</b><span id="mng">管理</span></div>
     <button class="newbtn">＋ 新建会话</button>
     <div class="conv on"><span class="cb"></span><span class="ct">重构主线 · 分支挖掘<span class="tm">今天 08:15 · 38 回合</span></span></div>
@@ -222,6 +231,7 @@ input[type=range]{margin-left:auto;width:150px;accent-color:var(--acc)}
     <div class="lrow">&#128101; 多智能体接力<span class="v" style="margin-left:8px">关</span><span class="switch"><i></i></span></div>
   </div></div>
 
+  <div class="sheet" id="detsheet"><div class="grab"></div><h4 id="detT"></h4><div class="list" id="detB"></div></div>
   <div class="settings" id="settings">
     <div class="sethead"><button class="ib" id="setBack" style="width:38px;height:38px">←</button><b>设置</b></div>
     <div class="setsearch">&#128269;<input id="q" placeholder="搜设置，比如「代理」「备份」"></div>
@@ -346,17 +356,19 @@ $("subBack").onclick=function(){if(SUBSTACK.length>1){SUBSTACK.pop();renderSub(S
 document.querySelectorAll("[data-sub]").forEach(function(it){it.onclick=function(){SUBSTACK=[it.dataset.sub];renderSub(it.dataset.sub,false)}});
 var models=[{g:"bai2",n:"qwen3.8-flash",ctx:"1M",t:1,v:1,d:1},{g:"bai2",n:"qwen3-max",ctx:"256k",t:1,v:0},{g:"官方",n:"gpt-4o-mini",ctx:"128k",t:1,v:1},{g:"官方",n:"claude-sonnet",ctx:"200k",t:1,v:1},{g:"本地",n:"qwen2.5-coder:32b",ctx:"32k",t:0,v:0}];
 function renderM(q){q=(q||"").toLowerCase();
- $("mlist").innerHTML=models.filter(function(m){return m.n.toLowerCase().indexOf(q)>=0}).map(function(m){return '<div class="mrow '+(m.d?"def":"")+'" data-n="'+m.n+'"><span class="nm">'+m.n+'</span><span class="grp" style="margin:0 0 0 4px">'+m.g+'</span><span class="meta">ctx '+m.ctx+'</span><span class="cap">工具'+(m.t?"✓":'<span class="cap no">✗</span>')+'</span><span class="cap">视觉'+(m.v?"✓":'<span class="cap no">✗</span>')+'</span></div>'}).join("")||'<div style="color:var(--sub);font-size:12px;padding:8px">无匹配</div>';
- document.querySelectorAll(".mrow").forEach(function(r){r.onclick=function(){$("mchip").textContent="◉ "+r.dataset.n+" ▾";closeAll()}})}
+ $("mlist").innerHTML=(function(){var atn=window.ATTN||0;return models.filter(function(m){return m.n.toLowerCase().indexOf(q)>=0}).map(function(m){var dis=atn>0&&!m.v;return '<div class="mrow '+(m.d?"def":"")+(dis?" dis":"")+'" data-n="'+m.n+'"><span class="nm">'+m.n+'</span><span class="grp" style="margin:0 0 0 4px">'+m.g+'</span><span class="meta">ctx '+m.ctx+'</span><span class="cap">工具'+(m.t?"✓":'<span class="cap no">✗</span>')+'</span><span class="cap">'+(dis?'<span class="cap no">视觉✗ · 带图附件</span>':'视觉'+(m.v?"✓":'<span class="cap no">✗</span>'))+'</span></div>'}).join("")})()||'<div style="color:var(--sub);font-size:12px;padding:8px">无匹配</div>';
+ document.querySelectorAll(".mrow").forEach(function(r){r.onclick=function(){if(r.classList.contains("dis")){toast("这个模型看不了图：先移除图片附件，或换支持视觉的模型");return}$("mchip").textContent="◉ "+r.dataset.n+" ▾";closeAll()}})}
 renderM();$("ms").oninput=function(e){renderM(e.target.value.trim())};
-function closeAll(){$("msheet").classList.remove("on");$("tsheet").classList.remove("on");$("drawer").classList.remove("open");$("addmenu").classList.remove("on");syncMask()}
+function closeAll(){$("msheet").classList.remove("on");$("tsheet").classList.remove("on");$("drawer").classList.remove("open");$("addmenu").classList.remove("on");$("detsheet").classList.remove("on");syncMask()}
 function syncMask(){$("mask").classList.toggle("on",$("drawer").classList.contains("open")||$("msheet").classList.contains("on")||$("tsheet").classList.contains("on"))}
 $("mchip").onclick=function(){var s=$("msheet");var w=s.classList.contains("on");closeAll();if(!w){s.classList.add("on");syncMask()}};
 $("toolBtn").onclick=function(){var s=$("tsheet");var w=s.classList.contains("on");closeAll();if(!w){s.classList.add("on");syncMask()}};
 $("mask").onclick=closeAll;$("drawerBtn").onclick=function(){$("drawer").classList.toggle("open");syncMask()};
 $("addBtn").onclick=function(e){e.stopPropagation();$("addmenu").classList.toggle("on")};
 document.addEventListener("click",function(e){if(!e.target.closest("#addmenu")&&!e.target.closest("#addBtn"))$("addmenu").classList.remove("on");
- var c=e.target.closest(".conv");if(document.body.classList.contains("selecting")&&c){c.classList.toggle("sel");cnt()}});
+ var c=e.target.closest(".conv");if(!c)return;
+ if(document.body.classList.contains("selecting")){c.classList.toggle("sel");cnt()}
+ else{document.querySelectorAll(".conv").forEach(function(x){x.classList.remove("on")});c.classList.add("on");closeAll()}});
 var mic=false;
 $("micBtn").onclick=function(){mic=!mic;$("micBtn").innerHTML=mic?'<span style="color:var(--red)">● 松开发送</span>':'&#127908;'};
 var busy=false;
@@ -388,6 +400,30 @@ $("q").oninput=function(e){var k=e.target.value.trim().toLowerCase();
  document.querySelectorAll("#setbody .item").forEach(function(it){it.style.display=!k||it.textContent.toLowerCase().indexOf(k)>=0?"":"none"});
  document.querySelectorAll("#setbody .sec").forEach(function(s){var n=s.nextElementSibling,any=false;
   while(n&&!n.classList.contains("sec")&&!n.classList.contains("foot")){if(n.style.display!=="none")any=true;n=n.nextElementSibling}s.style.display=any||!k?"":"none"})};
+function toast(m){var t=$("toast");if(!t)return;t.textContent=m;t.className="toast on";clearTimeout(window.__tt);window.__tt=setTimeout(function(){t.className="toast"},1800)}
+window.ATTN=window.ATTN||0;
+function addAtt(ic,lb){var row=document.querySelector("#composer .attrow");if(!row)return;var s=document.createElement("span");s.className="th";s.innerHTML=ic+'<u data-rm>×</u>';row.appendChild(s);window.ATTN++;renderM($("ms").value.trim());toast("已添加附件（演示）："+lb)}
+document.querySelectorAll("#addmenu div").forEach(function(d){d.onclick=function(e){e.stopPropagation();addAtt(d.dataset.i,d.dataset.a);$("addmenu").classList.remove("on");syncMask()}});
+document.querySelector(".newbtn").onclick=function(){var dr=document.getElementById("drawer");var d=document.createElement("div");d.className="conv on";d.innerHTML='<span class="cb"></span><span class="ct">新会话 · 刚刚</span>';var first=dr.querySelector(".conv");if(first)first.parentNode.insertBefore(d,first);else dr.appendChild(d);document.querySelectorAll("#drawer .conv").forEach(function(x){x.classList.remove("on")});d.classList.add("on");document.body.classList.remove("selecting");closeAll();toast("已新建会话（演示数据）")};
+$("dsearch").oninput=function(e){var k=e.target.value.trim().toLowerCase();document.querySelectorAll("#drawer .conv").forEach(function(c){c.style.display=!k||c.textContent.toLowerCase().indexOf(k)>=0?"":"none"})};
+document.addEventListener("click",function(e){
+ var rm=e.target.closest("u[data-rm]");
+ if(rm){var s=rm.parentNode;if(s&&s.parentNode){s.parentNode.removeChild(s);window.ATTN=Math.max(0,window.ATTN-1);renderM($("ms").value.trim())}return}
+ var op=e.target.closest(".ops span");
+ if(op){var k=op.textContent;var mg=op.closest(".msg");var body=mg&&mg.querySelector(".txt")?mg.querySelector(".txt").textContent:"";
+  if(k==="复制"){var ok=function(){toast("已复制原文")};if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(body).then(ok,function(){fb(body);ok()})}else{fb(body);ok()}}
+  else if(k==="重新生成")toast("已按原设置重新生成（演示）");
+  else if(k==="引用"){var ip=document.querySelector("#composer .row1 input");if(ip){ip.value="↪ "+body.slice(0,36)+"… ";ip.focus()}toast("已引用到输入框")}
+  else if(k==="分享")toast("分享卡片已生成（演示）");
+  return}
+ var th=e.target.closest(".think");
+ if(th){var ex=th.nextElementSibling;if(ex&&ex.classList.contains("thinkbody"))ex.classList.toggle("off");else{var d=document.createElement("div");d.className="thinkbody";d.textContent="1) 先拉 CI 列表与最近提交；2) 核对分卷 manifest 的 sha256 链；3) 校验 APK 体积与签名；4) 汇总结论并标注未验证项。";th.parentNode.insertBefore(d,th.nextSibling)}return}
+ var dr2=e.target.closest(".drop");
+ if(dr2){var ex2=dr2.nextElementSibling;if(ex2&&ex2.classList.contains("dropbody"))ex2.classList.toggle("off");else{var d2=document.createElement("div");d2.className="dropbody";d2.textContent="被裁剪 96 条：早期天气查询 12 条、参数调试 51 条、日志粘贴 33 条；均未参与本轮上下文，附件与结论不受影响。";dr2.parentNode.insertBefore(d2,dr2.nextSibling)}return}
+ var tk=e.target.closest(".lrow[data-task]");
+ if(tk){$("detT").textContent=tk.dataset.task;$("detB").innerHTML='<div class="lrow">状态<span class="v">'+tk.dataset.st+'</span></div><div class="lrow">上次运行<span class="v">'+tk.dataset.last+'</span></div><div class="lrow" style="border-bottom:none">说明<span class="v" style="font-family:inherit;text-align:right">'+tk.dataset.note+'</span></div>';closeAll();$("detsheet").classList.add("on");syncMask();return}
+});
+function fb(s){var ta=document.createElement("textarea");ta.value=s;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy")}catch(e){}document.body.removeChild(ta)}
 window.__UI_V13_OK=1;
 </script>
 </body>
