@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hualuo RepoTool · UI v11d（赛马娘工作台按原版补全）</title>
+<style>
+:root{--bg:#f3f4f6;--card:#fff;--ink:#17181a;--sub:#7d8590;--line:#eceef2;--acc:#0a5cff;--ok:#16a34a;--warn:#f59e0b;--red:#e5484d}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:#e8eaee;font:15px/1.6 "ColorOS Sans","PingFang SC",sans-serif;color:var(--ink)}
+.ph{width:393px;max-width:100vw;height:100vh;height:100dvh;background:var(--bg);display:flex;flex-direction:column;position:fixed;left:50%;top:0;transform:translateX(-50%);overflow:hidden}
+header{display:flex;align-items:center;gap:10px;padding:14px 16px 8px;flex-shrink:0}
+.ib{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:50%;width:34px;height:34px;font-size:15px;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+header .t{font-size:17px;font-weight:600}
+header .ctx{margin-left:auto;background:var(--card);border-radius:14px;padding:3px 10px;font-size:11px;color:var(--sub);box-shadow:0 1px 3px rgba(0,0,0,.06);font-family:monospace}
+header .ctx b{color:var(--acc)}
+main{flex:1;overflow-y:auto;padding:0 14px 8px;overscroll-behavior:contain;min-height:0}
+.page{display:none}.page.on{display:block}
+.card{background:var(--card);border-radius:18px;padding:13px 15px;margin-bottom:11px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.card h5{font-size:12.5px;color:var(--sub);font-weight:500;margin-bottom:7px}
+.msg{border-radius:18px;padding:12px 14px;margin-bottom:11px;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.msg.me{background:#e3ecff;margin-left:36px}
+.who{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:11px;color:var(--sub);margin-bottom:5px}
+.badge{background:#f4f6fa;border-radius:6px;padding:1px 7px;font-family:monospace}
+.badge.g{color:var(--ok)}.badge.y{color:var(--warn)}.badge.r{color:var(--red)}
+.txt{font-size:14px}.txt code{font-family:monospace;font-size:12.5px;background:#f4f6fa;border-radius:5px;padding:1px 5px;color:var(--acc)}
+.think{border:1px dashed var(--line);border-radius:12px;padding:7px 10px;font-size:12.5px;color:var(--sub);margin-top:7px;cursor:pointer}
+.tool{border-left:3px solid var(--acc);background:#f7f9ff;border-radius:0 12px 12px 0;padding:7px 10px;font-size:12.5px;margin-top:7px}
+.att{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap}
+.att .a{border:1px solid var(--line);border-radius:10px;padding:3px 9px;font-size:12px;color:var(--sub);background:#fafbfc}
+.att .a.unknown{color:var(--warn);border-color:#f5d9a8}
+.drop{font-size:12px;color:var(--warn);margin-top:7px}
+.ops{display:flex;gap:13px;margin-top:7px;font-size:12px;color:var(--sub)}.ops span{cursor:pointer}
+.lrow{display:flex;align-items:center;padding:12px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.lrow:last-child{border-bottom:none}
+.lrow .v{margin-left:auto;color:var(--sub);font-size:12.5px;font-family:monospace}
+.chev{color:#c6ccd6;margin-left:6px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+.dot.g{background:var(--ok)}.dot.r{background:var(--red)}.dot.y{background:var(--warn)}.dot.n{background:#c6ccd6}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}.grid2 .card{margin-bottom:0}.grid2 .big{font-size:18px;font-weight:600}.grid2 .lbl{font-size:12px;color:var(--sub)}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;display:flex;margin-top:9px}.bar i{display:block;height:100%}
+.composer{background:var(--card);border-radius:22px 22px 0 0;padding:6px 10px 8px;box-shadow:0 -2px 10px rgba(0,0,0,.05);flex-shrink:0}
+.loopbar{display:flex;align-items:center;gap:8px;background:#fff7e8;border-radius:12px;padding:6px 10px;font-size:12px;color:#9a6b00;margin:4px 2px}
+.loopbar b{margin-left:auto;cursor:pointer;color:var(--red)}
+.queuebar{display:flex;align-items:center;gap:8px;background:#f0f5ff;border-radius:12px;padding:6px 10px;font-size:12px;color:var(--acc);margin:4px 2px}
+.queuebar b{margin-left:auto;cursor:pointer}
+.attrow{display:flex;gap:8px;padding:4px 4px 6px}
+.attrow .th{width:44px;height:44px;border-radius:10px;background:#e9edf3;display:flex;align-items:center;justify-content:center;font-size:19px;position:relative}
+.attrow .th u{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:#00000073;color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none}
+.row1{display:flex;align-items:flex-start;gap:6px}
+.row1 input{flex:1;background:var(--bg);border:none;border-radius:14px;padding:10px 12px;font-size:14px;outline:none;min-height:42px}
+.exp{border:none;background:none;color:var(--acc);font-size:15px;cursor:pointer;padding:6px 2px}
+.row2{display:flex;align-items:center;gap:6px;margin-top:6px;position:relative}
+.pill{border:none;background:var(--bg);border-radius:12px;height:32px;padding:0 11px;font-size:13px;color:var(--sub);cursor:pointer}
+.mchip{border:none;background:#e3ecff;color:var(--acc);border-radius:14px;height:32px;padding:0 12px;font-size:12.5px;font-weight:600;cursor:pointer}
+.send{width:40px;height:40px;border-radius:14px;border:none;background:var(--acc);color:#fff;font-size:16px;cursor:pointer;margin-left:auto}
+.send.stop{background:var(--red)}
+.addmenu{position:absolute;bottom:40px;left:0;background:var(--card);border-radius:14px;box-shadow:0 4px 18px rgba(0,0,0,.14);padding:6px;display:none;z-index:15;min-width:130px}
+.addmenu.on{display:block}
+.addmenu div{padding:9px 12px;font-size:13.5px;border-radius:9px;cursor:pointer}
+.mask{position:absolute;inset:0;background:rgba(0,0,0,.28);opacity:0;pointer-events:none;transition:.18s;z-index:19}.mask.on{opacity:1;pointer-events:auto}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-radius:22px 22px 0 0;padding:12px 14px;z-index:20;max-height:70%;display:none;flex-direction:column}
+.sheet.on{display:flex;animation:up .2s}
+@keyframes up{from{transform:translateY(105%)}to{transform:none}}
+.grab{width:36px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 8px}
+.sheet h4{font-size:15px;font-weight:600;margin-bottom:8px}
+.sheet input.s{width:100%;background:var(--bg);border:none;border-radius:12px;padding:9px 12px;font-size:13px;outline:none;margin-bottom:8px}
+.sheet .list{overflow-y:auto;overscroll-behavior:contain;min-height:0}
+.grp{font-size:11px;color:var(--sub);margin:7px 2px 3px}
+.mrow{display:flex;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;margin-bottom:7px;background:#fafbfc;cursor:pointer}
+.mrow.def{border-color:var(--acc);background:#f0f5ff}
+.mrow .nm{font-size:14px;font-weight:500}
+.mrow .meta{margin-left:auto;font-size:11px;color:var(--sub);font-family:monospace}
+.cap{font-size:10px;border-radius:5px;padding:1px 5px;background:#eef1f6;color:var(--sub)}
+.cap.no{background:#fdecec;color:var(--red)}
+.lockrow{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--sub);padding-top:6px}
+.switch{margin-left:auto;width:40px;height:24px;border-radius:12px;background:#dfe3ea;position:relative;cursor:pointer;flex-shrink:0}
+.switch i{position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.switch.on{background:var(--acc)}.switch.on i{left:19px}
+.lv{display:flex;gap:6px;margin:2px 0 8px}
+.lv span{flex:1;text-align:center;border:1px solid var(--line);border-radius:10px;padding:6px 0;font-size:12.5px;cursor:pointer;color:var(--sub)}
+.lv span.on{border-color:var(--acc);background:#e3ecff;color:var(--acc);font-weight:600}
+.drawer{position:absolute;left:0;top:0;bottom:0;width:284px;background:var(--card);z-index:30;transform:translateX(-105%);transition:.2s;padding:16px 13px 70px;overflow-y:auto;overscroll-behavior:contain}
+.drawer.open{transform:none}
+.dsearch{background:var(--bg);border-radius:12px;padding:8px 12px;font-size:13px;color:var(--sub);margin-bottom:10px}
+.dhead{display:flex;align-items:center;margin-bottom:8px}.dhead b{font-size:15px}.dhead span{margin-left:auto;color:var(--acc);font-size:13px;cursor:pointer}
+.newbtn{width:100%;border:none;background:var(--acc);color:#fff;border-radius:14px;height:40px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:12px}
+.conv{display:flex;align-items:center;padding:10px 11px;border-radius:12px;margin-bottom:5px;cursor:pointer}
+.conv.on{background:#e3ecff}.conv.on .ct{color:var(--acc);font-weight:600}
+.conv .ct{font-size:13.5px;flex:1}.conv .tm{display:block;font-size:11px;color:var(--sub);font-weight:400}
+.cb{display:none;width:19px;height:19px;border-radius:50%;border:2px solid #c6ccd6;margin-right:9px;flex-shrink:0}
+body.selecting .cb{display:flex;align-items:center;justify-content:center}
+.conv.sel .cb{background:var(--acc);border-color:var(--acc)}
+.conv.sel .cb::after{content:"✓";color:#fff;font-size:10px}
+body.selecting .newbtn,body.selecting .dhead b{visibility:hidden}
+.selbar{position:absolute;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:10px 14px 16px;display:none;align-items:center;gap:10px;z-index:31}
+body.selecting .selbar{display:flex}
+.selbar .cnt{font-size:12.5px;color:var(--sub)}.selbar .del{margin-left:auto;color:var(--red)}
+.confirm{position:absolute;inset:0;z-index:50;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.3)}.confirm.on{display:flex}
+.cbox{width:280px;background:var(--card);border-radius:20px;padding:20px;text-align:center}
+.csub{font-size:12px;color:var(--sub);margin-bottom:14px}
+.cbtns{display:flex;gap:10px}.cbtns span,.cbtns b{flex:1;border-radius:12px;height:38px;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer}.cbtns span{background:var(--bg)}.cbtns b{background:#fdecec;color:var(--red)}
+nav{display:flex;background:var(--card);border-top:1px solid var(--line);padding:5px 0 11px;flex-shrink:0}
+nav a{flex:1;text-align:center;font-size:10.5px;color:var(--sub);cursor:pointer}
+nav a i{display:block;font-size:18px;font-style:normal;filter:grayscale(1);opacity:.7}
+nav a.on{color:var(--acc)}nav a.on i{filter:none;opacity:1}
+.settings{position:absolute;inset:0;background:var(--bg);z-index:40;transform:translateX(100%);transition:transform .22s,visibility 0s .22s;display:flex;flex-direction:column;visibility:hidden}
+.settings.open{transform:none;visibility:visible;transition:transform .22s}
+.sethead{display:flex;align-items:center;gap:12px;padding:14px 16px 6px;flex-shrink:0}.sethead b{font-size:20px}
+.setsearch{margin:2px 16px 8px;display:flex;align-items:center;gap:8px;background:var(--card);border-radius:16px;padding:9px 14px;box-shadow:0 1px 3px rgba(0,0,0,.05);flex-shrink:0}
+.setsearch input{flex:1;border:none;outline:none;background:none;font-size:14px}
+.setbody{flex:1;overflow-y:auto;padding:0 14px 26px;overscroll-behavior:contain;min-height:0}
+.sec{font-size:13px;color:var(--acc);font-weight:600;margin:13px 6px 7px}
+.item{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:18px;padding:12px 14px;margin-bottom:9px;box-shadow:0 1px 3px rgba(0,0,0,.05);cursor:pointer}
+.ic{width:36px;height:36px;border-radius:12px;background:#e9f0ff;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.tx{flex:1;min-width:0}.tx .t{font-size:14.5px;font-weight:600}.tx .d{font-size:11.5px;color:var(--sub)}
+.val{font-size:11.5px;color:var(--sub);font-family:monospace;max-width:92px;text-align:right}
+.foot{text-align:center;font-size:11px;color:#a8afba;padding:12px 0 2px}
+.subpage{position:absolute;inset:0;background:var(--bg);z-index:41;transform:translateX(100%);transition:transform .2s,visibility 0s .2s;display:flex;flex-direction:column;visibility:hidden}
+.subpage.open{transform:none;visibility:visible;transition:transform .2s}
+.frow{display:flex;align-items:center;background:var(--card);border-radius:16px;padding:12px 14px;margin-bottom:9px;box-shadow:0 1px 3px rgba(0,0,0,.05);font-size:14px}
+.frow.top{align-items:flex-start}
+.frow .fv{margin-left:auto;color:var(--sub);font-size:12.5px;font-family:monospace}
+.frow input[type=text]{margin-left:auto;border:none;outline:none;background:none;font-size:13px;text-align:right;max-width:190px;color:var(--ink)}
+.frow .big-in{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;outline:none;background:var(--bg);margin:2px 0 10px}
+.btnpill{border:none;background:#dfe3ea;color:var(--sub);border-radius:20px;height:40px;padding:0 18px;font-size:13.5px;cursor:pointer;margin-bottom:4px}
+.fnote{font-size:12px;color:var(--sub);padding:2px 6px 10px}
+input[type=range]{margin-left:auto;width:150px;accent-color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="ph">
+  <header><button class="ib" id="drawerBtn">☰</button><div class="t" id="pageTitle">回合流</div><div class="ctx">ctx <b>21.4k</b>/1M · 发 <b>856</b></div></header>
+  <main>
+    <div class="page on" id="p-chat">
+      <div class="msg me"><div class="txt">把仓库工具的分卷上传接上，再给我看下 CI 状态</div></div>
+      <div class="msg">
+        <div class="who"><span class="badge">qwen3.8-flash · bai2</span><span class="badge g">结论</span><span class="badge">依据 4</span><span class="badge y">未验 1</span><span class="badge">思考·高</span><span>08:12</span></div>
+        <div class="txt">分卷引擎已跑通：<code>part_001.zip</code> + <code>manifest.json</code>，断点续传以 sha256 对账。CI run <code>34723037840</code> 绿，APK 63.5MB。</div>
+        <div class="think">▸ 思考过程（7.2s）</div>
+        <div class="tool">🔧 github_get_workflow_runs → success · 1.2s</div>
+        <div class="att"><span class="a">📄 manifest.json</span><span class="a">🖼 shot.png</span><span class="a">📕 PDF 3/12 页</span><span class="a">🎬 视频抽帧 ×8</span><span class="a unknown">❓ 未识别 type（占位不丢）</span></div>
+        <div class="drop">⚠ 本回合丢弃：历史裁剪 96 条（点开查看）</div>
+        <div class="ops"><span>复制</span><span>重新生成</span><span>引用</span><span>分享</span></div>
+      </div>
+      <div class="msg" style="border-left:3px solid var(--red)">
+        <div class="who"><span class="badge r">系统</span><span>08:15</span></div>
+        <div class="txt">传输中断（524）。<b>工具已成功，无需重做</b>：最后提交 <code>7d551d4a</code>。已自动续跑。</div>
+      </div>
+    </div>
+    <div class="page" id="p-task">
+      <div class="grid2"><div class="card"><div class="lbl">运行中</div><div class="big">2</div></div><div class="card"><div class="lbl">今日完成</div><div class="big">7</div></div></div>
+      <div class="card"><h5>定时任务</h5>
+        <div class="lrow"><span class="dot g"></span>夜间备份导出<span class="v">02:00 · 下次 17h</span><span class="chev">›</span></div>
+        <div class="lrow"><span class="dot y"></span>仓库巡检 CI<span class="v">每 6h · 暂停</span><span class="chev">›</span></div></div>
+    </div>
+    <div class="page" id="p-tool">
+      <div class="card"><h5>四态分列：注册 / 接线 / 开关 / 可执行</h5>
+        <div class="lrow">audit_list<span class="v"><span class="dot g"></span><span class="dot g"></span><span class="dot g"></span><span class="dot g"></span></span></div>
+        <div class="lrow">courier 文件投递<span class="v"><span class="dot g"></span><span class="dot g"></span><span class="dot g"></span><span class="dot y"></span></span></div>
+        <div class="lrow">uma_read_endpoint<span class="v"><span class="dot g"></span><span class="dot g"></span><span class="dot r"></span><span class="dot n"></span></span></div></div>
+    </div>
+    <div class="page" id="p-repo">
+      <div class="card"><h5>hualuo-repo-tool · main</h5>
+        <div class="lrow"><span class="dot g"></span>CI run 34691352476<span class="v">success · e7ef4682</span></div>
+        <div class="lrow">三道闸门<span class="v">配平✓ 计数✓ 变异✓</span></div></div>
+    </div>
+    <div class="page" id="p-obs">
+      <div class="card"><h5>赛马娘观测桥（只读门禁）</h5>
+        <div class="lrow">127.0.0.1:18765<span class="v"><span class="dot g"></span>在线 · 只读</span></div>
+        <div class="lrow">18766 push→浮窗<span class="v"><span class="dot y"></span>未启用</span></div></div>
+    </div>
+  </main>
+  <div class="composer" id="composer">
+    <div class="loopbar">🔁 会话循环 4/20 · 每 300s<b>■ 停</b></div>
+    <div class="queuebar" id="queuebar">⏳ 排队中 1 条：「继续挖 phase2」<b id="qdel">移除 ×</b></div>
+    <div class="attrow"><span class="th">🖼<u>×</u></span><span class="th">📕<u>×</u></span><span class="th" style="color:var(--warn)">❓<u>×</u></span></div>
+    <div class="row1"><input placeholder="发消息…（草稿自动存）"><button class="exp">⛶</button></div>
+    <div class="row2">
+      <button class="pill" id="addBtn">＋ 附件</button>
+      <button class="mchip" id="mchip">◉ qwen3.8-flash ▾</button>
+      <button class="pill" id="toolBtn">⋮ 工具</button>
+      <button class="pill" id="micBtn">🎤</button>
+      <button class="send" id="send">➤</button>
+      <div class="addmenu" id="addmenu"><div>🖼 照片</div><div>🎬 视频（自动抽帧）</div><div>📎 文件（PDF 选页）</div></div>
+    </div>
+  </div>
+  <nav id="tabs">
+    <a class="on" data-p="p-chat"><i>💬</i>回合流</a><a data-p="p-task"><i>⏱</i>长任务</a><a data-p="p-tool"><i>🧰</i>工具</a><a data-p="p-repo"><i>📦</i>仓库CI</a><a data-p="p-obs"><i>📡</i>观测</a>
+  </nav>
+  <div class="mask" id="mask"></div>
+  <div class="drawer" id="drawer">
+    <div class="dsearch">🔍 搜索会话与消息…</div>
+    <div class="dhead"><b>会话</b><span id="mng">管理</span></div>
+    <button class="newbtn">＋ 新建会话</button>
+    <div class="conv on"><span class="cb"></span><span class="ct">重构主线 · 分支挖掘<span class="tm">今天 08:15 · 38 回合</span></span></div>
+    <div class="conv"><span class="cb"></span><span class="ct">仓库工具 M1.5 设计<span class="tm">昨天 22:40 · 12 回合</span></span></div>
+    <div class="conv"><span class="cb"></span><span class="ct">赛马娘 Uma 训练<span class="tm">09-12 · 未接管</span></span></div>
+    <div class="conv"><span class="cb"></span><span class="ct">备份排查<span class="tm">09-10 · 6 回合</span></span></div>
+    <div class="lrow" data-set="s-mine" style="margin-top:10px">常用网站<span class="chev">›</span></div>
+    <div class="lrow" data-set="s-data">导出备份<span class="chev">›</span></div>
+    <div class="lrow" data-set="s-service">模型与参数<span class="chev">›</span></div>
+    <div class="lrow" data-set="s-general">设置<span class="chev">›</span></div>
+  </div>
+  <div class="selbar"><button class="pill" id="selAll">全选</button><span class="cnt" id="selCnt">已选 0</span><button class="pill del" id="delSel">删除所选</button><button class="pill" id="selCancel">取消</button></div>
+  <div class="confirm" id="cfm"><div class="cbox"><div style="font-size:15px;margin-bottom:6px" id="cfmTxt"></div><div class="csub">消息与附件引用一并删除，导出过的备份不受影响</div><div class="cbtns"><span id="cfmNo">取消</span><b id="cfmYes">删除</b></div></div></div>
+  <div class="sheet" id="msheet"><div class="grab"></div><h4>切换模型</h4>
+    <input class="s" id="ms" placeholder="搜索模型…"><div class="list" id="mlist"></div>
+    <label class="lockrow"><input type="checkbox"> 锁定到本会话（不勾仅影响下一条）</label></div>
+  <div class="sheet" id="tsheet"><div class="grab"></div><h4>本回合工具</h4><div class="list">
+    <div class="lrow">🧠 思考<span class="v" style="margin-left:8px">开 · 高</span><span class="switch on"><i></i></span></div>
+    <div class="lv"><span>低</span><span>中</span><span class="on">高</span><span>最高</span></div>
+    <div class="lrow">🌐 网页搜索<span class="v" style="margin-left:8px">开</span><span class="switch on"><i></i></span></div>
+    <div class="lrow">⌨️ 终端 Shell<span class="v" style="margin-left:8px">关</span><span class="switch"><i></i></span></div>
+    <div class="lrow">▶️ 代码执行<span class="cap" style="margin-left:8px">仅 Gemini</span><span class="switch"><i></i></span></div>
+    <div class="lrow">👥 多智能体接力<span class="v" style="margin-left:8px">关</span><span class="switch"><i></i></span></div>
+  </div></div>
+
+  <div class="settings" id="settings">
+    <div class="sethead"><button class="ib" id="setBack" style="width:38px;height:38px">←</button><b>设置</b></div>
+    <div class="setsearch">🔍<input id="q" placeholder="搜设置，比如「代理」「备份」"></div>
+    <div class="setbody" id="setbody">
+      <div class="sec" id="s-service">AI 服务</div>
+      <div class="item" data-sub="provider"><span class="ic">☁️</span><span class="tx"><div class="t">提供商</div><div class="d">用哪家 AI、地址和密钥。密钥只存本机，不外发</div></span><span class="val">3 家</span><span class="chev">›</span></div>
+      <div class="item" data-sub="model"><span class="ic">🗨️</span><span class="tx"><div class="t">模型</div><div class="d">勾选哪些能用；上下文上限用模型真实值</div></span><span class="val">启用 5</span><span class="chev">›</span></div>
+      <div class="item" data-sub="proxy"><span class="ic">🌐</span><span class="tx"><div class="t">代理</div><div class="d">网络不通时走 HTTP/SOCKS 转发</div></span><span class="val">未设置</span><span class="chev">›</span></div>
+      <div class="sec" id="s-chat">对话</div>
+      <div class="item" data-sub="prompt"><span class="ic">🧠</span><span class="tx"><div class="t">系统指令</div><div class="d">每次开聊前先交代的家规</div></span><span class="val">2 条</span><span class="chev">›</span></div>
+      <div class="item" data-sub="gen"><span class="ic">🎛️</span><span class="tx"><div class="t">生成参数</div><div class="d">温度、top_p、带多少历史</div></span><span class="val">temp 0.7</span><span class="chev">›</span></div>
+      <div class="item" data-sub="title"><span class="ic">✏️</span><span class="tx"><div class="t">标题生成</div><div class="d">聊完自动给会话起名字</div></span><span class="switch on"><i></i></span></div>
+      <div class="item" data-sub="trim"><span class="ic">✂️</span><span class="tx"><div class="t">历史裁剪</div><div class="d">装不下时砍谁，砍了必须出声</div></span><span class="val">按 token</span><span class="chev">›</span></div>
+      <div class="sec">多模态</div>
+      <div class="item" data-sub="caption"><span class="ic">🖼️</span><span class="tx"><div class="t">图像转述</div><div class="d">能看的模型把图说成文字给不能看的用</div></span><span class="chev">›</span></div>
+      <div class="item" data-sub="imagegen"><span class="ic">🎨</span><span class="tx"><div class="t">图像生成</div><div class="d">按你写的文字出图</div></span><span class="chev">›</span></div>
+      <div class="sec">工具</div>
+      <div class="item" data-sub="websearch"><span class="ic">🔎</span><span class="tx"><div class="t">网页搜索</div><div class="d">让 AI 上网查实时资料</div></span><span class="chev">›</span></div>
+      <div class="item" data-sub="chatsearch"><span class="ic">🔍</span><span class="tx"><div class="t">对话搜索</div><div class="d">翻以前聊过的内容</div></span><span class="chev">›</span></div>
+      <div class="item" data-sub="shell"><span class="ic">⌨️</span><span class="tx"><div class="t">终端</div><div class="d">手机上跑命令（沙盒里）</div></span><span class="chev">›</span></div>
+      <div class="item" data-sub="github"><span class="ic">⟨⟩</span><span class="tx"><div class="t">GitHub 工作台</div><div class="d">登录、仓库、CI、PR</div></span><span class="val">xf8410</span><span class="chev">›</span></div>
+      <div class="item" data-sub="courier"><span class="ic">📤</span><span class="tx"><div class="t">文件投递</div><div class="d">手机文件传 GitHub 仓，自动切片可续传</div></span><span class="chev">›</span></div>
+      <div class="item" data-sub="audit"><span class="ic">🧾</span><span class="tx"><div class="t">二进制审计</div><div class="d">导入大文件查内容，只读</div></span><span class="chev">›</span></div>
+      <div class="item" data-sub="uma"><span class="ic">🎰</span><span class="tx"><div class="t">赛马娘工作台</div><div class="d">SO 连接、Session 导出、通信观测</div></span><span class="val">在线</span><span class="chev">›</span></div>
+      <div class="sec">自动化</div>
+      <div class="item" data-sub="tasks"><span class="ic">⏰</span><span class="tx"><div class="t">定时任务</div><div class="d">到点自动干活，每次开新会话</div></span><span class="val">2 启用</span><span class="chev">›</span></div>
+      <div class="item" data-sub="loop"><span class="ic">🔁</span><span class="tx"><div class="t">会话循环</div><div class="d">隔一阵自动接一句，有轮次上限</div></span><span class="val">1 运行</span><span class="chev">›</span></div>
+      <div class="item" data-sub="relay"><span class="ic">👥</span><span class="tx"><div class="t">多智能体接力</div><div class="d">几个模型接龙：一个主答一个挑错</div></span><span class="chev">›</span></div>
+      <div class="sec" id="s-data">记忆与数据</div>
+      <div class="item" data-sub="memory"><span class="ic">💾</span><span class="tx"><div class="t">记忆</div><div class="d">AI 长期记的东西，能看能删</div></span><span class="val">2 文件</span><span class="chev">›</span></div>
+      <div class="item" data-sub="datactl"><span class="ic">🗄️</span><span class="tx"><div class="t">数据控制</div><div class="d">导出一个文件 / 导入合并</div></span><span class="chev">›</span></div>
+      <div class="item" data-sub="storage"><span class="ic">📊</span><span class="tx"><div class="t">存储占用</div><div class="d">对话附件各占多少，清缓存</div></span><span class="val">2.4/8.1G</span><span class="chev">›</span></div>
+      <div class="sec" id="s-mine">我的</div>
+      <div class="item" data-sub="sites"><span class="ic">🔖</span><span class="tx"><div class="t">常用网站</div><div class="d">收藏链接速开，AI 帮你存</div></span><span class="val">12 条</span><span class="chev">›</span></div>
+      <div class="item" data-sub="roadmap"><span class="ic">💡</span><span class="tx"><div class="t">待开发任务</div><div class="d">想要的功能先记这</div></span><span class="val">3 待办</span><span class="chev">›</span></div>
+      <div class="sec" id="s-general">外观与通用</div>
+      <div class="item" data-sub="appearance"><span class="ic">🎭</span><span class="tx"><div class="t">外观</div><div class="d">亮/暗/跟随，主色可换</div></span><span class="val">跟随</span><span class="chev">›</span></div>
+      <div class="item" data-sub="lang"><span class="ic">🈶</span><span class="tx"><div class="t">语言</div><div class="d">界面显示语言</div></span><span class="val">中文</span><span class="chev">›</span></div>
+      <div class="sec">关于</div>
+      <div class="item" data-sub="about"><span class="ic">ℹ️</span><span class="tx"><div class="t">关于</div><div class="d">版本 · 更新 · 崩溃报告 · 提 issue</div></span><span class="chev">›</span></div>
+      <div class="foot">每一项都能点开，点开才是真设置</div>
+    </div>
+  </div>
+
+  <div class="subpage" id="sub"><div class="sethead"><button class="ib" id="subBack" style="width:38px;height:38px">←</button><b id="subTitle"></b></div><div class="setbody" id="subbody"></div></div>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const SUB={
+uma:["赛马娘工作台",[
+ ["sec","Agora 内置 SO 连接"],
+ ["a","▶","启动监听与 Agora 浮窗","直接读取 127.0.0.1:18765；赛马娘保持前台，不经过浏览器或其他 App"],
+ ["a","🔄","自动分析开关","关键状态变化后复用后台生成引擎；最短间隔 20 秒"],
+ ["a","✨","立即分析","读取一致快照，并让默认模型使用全部 uma_* 工具分析"],
+ ["a","↻","立即刷新","只请求当前 /summary，不调用模型"],
+ ["a","■","停止工作台","停止后台监听、通信观测并移除 Agora 浮窗"],
+ ["sec","Session 导出"],
+ ["at","保存完整 Session ZIP","输入 Session ID 后由 Android 系统文件选择器选择保存目录和文件名；不会固定写入下载目录。"],
+ ["in2","Session ID"],
+ ["btn","⬇ 选择位置并保存"],
+ ["sec","通信协议观测"],
+ ["a","👁","在游戏浮窗中控制","浮窗底部可直接开始或停止观测。SO 未连接时进入准备状态，游戏启动后自动开启；临时断线后也会自动恢复。"],
+ ["sec","怎么读取"],
+ ["at","在对话中直接说","“读取最近的赛马娘通信端点并按顺序整理”→ 模型调 uma_protocol_metadata；读业务状态调 uma_get_snapshot、uma_event_observations 等。"],
+ ["sec","数据范围"],
+ ["at","完整通信数据交给模型","协议观测返回完整的 path、header、cookie、token、payload 和 hex。本地采集容量由 hlpatch 单独管理。"],
+ ["n","红线：一切对游戏只读，不写内存不发包；18767 冻结待拍板"]],
+provider:["提供商",[["r","bai2 网关","OpenAI 兼容 · 已配置 ›"],["r","官方 API","OpenAI / Anthropic · 已配置 ›"],["r","本地 ollama","127.0.0.1:11434 · 在线 ›"],["r","＋ 添加提供商","自定义 OpenAI 兼容端点"],["n","密钥只存本机，明文（拍板 D-10）；导出备份会带上密钥，别外传"]]],
+model:["模型",[["s","qwen3.8-flash · 1M · 工具✓ 视觉✓",1],["s","qwen3-max · 256k · 工具✓",1],["s","gpt-4o-mini · 128k",1],["s","claude-sonnet · 200k",1],["s","qwen2.5-coder:32b · 32k · 本地",1],["i","别名（聊天框胶囊显示名）","留空=模型原名"],["n","上下文上限从模型端探测，探测不到就标灰「未知」，不许手填冒充"]]],
+proxy:["代理",[["g","类型",["无","HTTP","SOCKS"],0],["i","地址","127.0.0.1"],["i","端口","7890"],["n","只影响 AI 请求和 GitHub API，不影响游戏观测桥"]]],
+prompt:["系统指令",[["r","家规 · 全局","结论必须带证据；丢东西要出声 ›"],["r","仓库工 · 会话级","改动走 workbench 分支，CI 绿了才提 PR ›"],["r","＋ 新建指令",""],["n","全局指令每条对话都带；会话级只在指定对话生效"]]],
+gen:["生成参数",[["l","温度","0","2",0.7],["l","top_p","0","1",0.95],["g","带多少历史",["20 条","50 条","按 token 装满"],2],["n","历史「按条数」会浪费大上下文模型，默认按 token 装到真值上限"]]],
+title:["标题生成",[["s","启用",1],["g","用哪个模型",["跟随当前","固定小模型（省钱）"],1],["i","起标题的提示词（可空）","10 字以内，概括主题"]]],
+trim:["历史裁剪",[["g","策略",["按 token","按条数"],0],["i","单回合上限 token","128000"],["s","裁剪时界面出声（⚠ 行）",1],["n","这条开关默认锁死，关掉等于允许静默丢历史——红线"]]],
+caption:["图像转述",[["g","转述用模型",["qwen3.8-flash","gpt-4o-mini"],0],["i","转述要求","说清图里的文字、数字、界面布局"],["n","目标模型没有视觉时自动先转述；有视觉直接原图发"]]],
+imagegen:["图像生成",[["g","服务商",["OpenAI","ComfyUI 本地","Pollinations 免费"],0],["g","尺寸",["1:1","16:9","9:16"],0],["s","生成结果自动作为附件登记",1]]],
+websearch:["网页搜索",[["g","服务商",["自动（免密优先）","DuckDuckGo","Tavily","Serper"],0],["i","API 密钥（Tavily/Serper 需要）",""],["n","DuckDuckGo 免密钥但结果偶尔糊；Tavily 每月免费额度大"]]],
+chatsearch:["对话搜索",[["s","启用",1],["g","方式",["关键词（快）","语义（要嵌入模型）"],0],["g","嵌入模型",["OpenAI","ollama 本地","不下载"],2],["n","语义搜索首次要下嵌入模型（约 80MB），下完离线可用"]]],
+shell:["终端",[["s","启用",0],["g","后端",["proot 沙盒","禁用"],0],["l","单命令超时","10","300",60],["n","命令在沙盒里跑；写操作和危险命令执行前弹确认"]]],
+github:["GitHub 工作台",[["r","登录状态","xf8410 · 令牌有效 ›"],["i","默认仓库","xf8410/hualuo-repo-tool"],["s","记忆文件同步到私有仓",1],["r","Actions 监视","1 个 run 在盯 ›"],["n","写操作只进 workbench/* 分支，main 靠 PR 合"]]],
+courier:["文件投递",[["i","目标仓库","xf8410/hualuo-courier"],["l","切片大小 MB","8","64",32],["s","上传前显示总大小和卷数，等你确认",1],["n","断了自动续传，按 sha256 对账，不重复传"]]],
+audit:["二进制审计",[["r","global-metadata.dat","16.2 MB · IL2CPP v31 ›"],["r","base.apk","63.5 MB ›"],["s","重复导入按 sha256 去重",1],["n","审计库只读；大文件分块读，不进内存"]]],
+tasks:["定时任务",[["r","夜间备份导出","02:00 · 启用 ›"],["r","仓库巡检 CI","每 6h · 暂停 ›"],["r","＋ 新建任务","说清时间、干什么、发到哪"],["n","每次执行开一个新会话，跑完在列表里留完整现场"]]],
+loop:["会话循环",[["r","当前运行","重构主线 4/20 · 每 300s ›"],["l","默认间隔秒","60","3600",300],["l","最大轮次","1","100",20],["n","检查点存库：崩了重开接着跑，不从头再来"]]],
+relay:["多智能体接力",[["r","队伍「代码审查」","3 棒：写 → 挑错 → 定稿 ›"],["r","＋ 新建队伍","每棒单独选模型"],["n","接力产出合成一条回复，每棒署名，账不混"]]],
+memory:["记忆",[["r","活跃记忆（当前注入对话）","1.8 KB ›"],["r","agora重构-地基状态.md","3.2 KB ›"],["s","AI 可自动增删记忆",1],["n","记忆=AI 自己写的备忘，跨对话生效；这里能看能删"]]],
+datactl:["数据控制",[["r","立即导出","全部对话+附件清单 → 一个文件 ›"],["r","从备份导入","合并模式，同 id 跳过不覆盖 ›"],["g","自动备份",["关","每天","每周"],1],["i","备份目录","Download/hualuo-backups/"]]],
+storage:["存储占用",[["r","对话","1.9 GB ›"],["r","附件","0.5 GB ›"],["r","缓存（可清）","0.1 GB · 清理 ›"],["n","备份不加密（拍板 D-10），存放位置自己负责"]]],
+sites:["常用网站",[["r","mine · xf8410/hualuo-repo-tool","自己的仓 ›"],["r","external · github.com/MetaCat","别人的 ›"],["r","＋ 添加","跟 AI 说一句「收藏这个链接」也行"]]],
+roadmap:["待开发任务",[["r","todo · 设置页语音输入挪聊天框","已定稿待实现 ›"],["r","doing · 分卷上传接线","差最后一步 ›"],["r","done · 版本单源","CI 已判 ›"],["r","＋ 记一条",""]]],
+appearance:["外观",[["g","主题",["亮色","暗色","跟随系统"],2],["g","主色",["蓝","青","紫","橙"],0],["s","跟随壁纸动态取色",0],["n","语义色（成功绿/错误红）不随主色变，防花"]]],
+lang:["语言",[["g","界面语言",["跟随系统","简体中文","English"],1],["n","只换界面文字；AI 回复语言看系统指令"]]],
+about:["关于",[["r","版本","0.1.0 (1) · 单源 ›"],["r","检查更新","›"],["s","崩溃报告：本地留一份，启动问一次",1],["r","提 issue","xf8410/hualuo-repo-tool ›"],["r","开源许可","›"],["r","给个好评",""]]]};
+function renderSub(k){const s=SUB[k];if(!s)return;$("subTitle").textContent=s[0];
+ $("subbody").innerHTML=s[1].map(f=>{
+  if(f[0]==="r")return `<div class="frow">${f[1]}<span class="fv">${f[2]||""}</span></div>`;
+  if(f[0]==="s")return `<div class="frow">${f[1]}<span class="switch${f[2]?" on":""}"><i></i></span></div>`;
+  if(f[0]==="g")return `<div style="font-size:12.5px;color:var(--sub);margin:4px 6px">${f[1]}</div><div class="lv">${f[2].map((o,i)=>`<span class="${i===f[3]?"on":""}">${o}</span>`).join("")}</div>`;
+  if(f[0]==="i")return `<div class="frow">${f[1]}<input type="text" placeholder="${f[2]||""}"></div>`;
+  if(f[0]==="l")return `<div class="frow">${f[1]}<input type="range" min="${f[2]}" max="${f[3]}" value="${f[4]}"><b style="font-family:monospace;margin-left:8px">${f[4]}</b></div>`;
+  if(f[0]==="n")return `<div class="fnote">${f[1]}</div>`;
+  if(f[0]==="sec")return `<div class="sec">${f[1]}</div>`;
+  if(f[0]==="a")return `<div class="frow top"><span class="ic" style="color:var(--acc)">${f[1]}</span><span class="tx"><div class="t">${f[2]}</div><div class="d" style="font-size:12.5px;line-height:1.5">${f[3]}</div></span></div>`;
+  if(f[0]==="at")return `<div class="frow" style="display:block"><div class="t" style="font-size:15px;font-weight:600;margin-bottom:3px">${f[1]}</div><div class="d" style="font-size:12.5px;color:var(--sub)">${f[2]}</div></div>`;
+  if(f[0]==="in2")return `<div><input class="big-in" type="text" placeholder="${f[1]}"></div>`;
+  if(f[0]==="btn")return `<div><button class="btnpill">${f[1]}</button></div>`;}).join("");
+ bindSw();$("sub").classList.add("open");$("subbody").scrollTop=0}
+function bindSw(){document.querySelectorAll("#subbody .switch").forEach(s=>s.onclick=()=>s.classList.toggle("on"));
+ document.querySelectorAll("#subbody .lv span").forEach(v=>v.onclick=()=>{v.parentNode.querySelectorAll("span").forEach(x=>x.classList.remove("on"));v.classList.add("on")});
+ document.querySelectorAll("#subbody input[type=range]").forEach(r=>r.oninput=()=>r.nextElementSibling.textContent=r.value)}
+$("subBack").onclick=()=>$("sub").classList.remove("open");
+document.querySelectorAll("[data-sub]").forEach(it=>it.onclick=()=>renderSub(it.dataset.sub));
+const models=[{g:"bai2",n:"qwen3.8-flash",ctx:"1M",t:1,v:1,d:1},{g:"bai2",n:"qwen3-max",ctx:"256k",t:1,v:0},{g:"官方",n:"gpt-4o-mini",ctx:"128k",t:1,v:1},{g:"官方",n:"claude-sonnet",ctx:"200k",t:1,v:1},{g:"本地",n:"qwen2.5-coder:32b",ctx:"32k",t:0,v:0}];
+function renderM(q=""){$("mlist").innerHTML=models.filter(m=>m.n.toLowerCase().includes(q.toLowerCase())).map(m=>`<div class="mrow ${m.d?"def":""}" data-n="${m.n}"><span class="nm">${m.n}</span><span class="grp" style="margin:0 0 0 4px">${m.g}</span><span class="meta">ctx ${m.ctx}</span><span class="cap">工具${m.t?"✓":'<span class="cap no">✗</span>'}</span><span class="cap">视觉${m.v?"✓":'<span class="cap no">✗</span>'}</span></div>`).join("")||'<div style="color:var(--sub);font-size:12px;padding:8px">无匹配</div>';
+ document.querySelectorAll(".mrow").forEach(r=>r.onclick=()=>{$("mchip").textContent="◉ "+r.dataset.n+" ▾";closeAll();});}
+renderM();$("ms").oninput=e=>renderM(e.target.value.trim());
+function closeAll(){$("msheet").classList.remove("on");$("tsheet").classList.remove("on");$("drawer").classList.remove("open");$("addmenu").classList.remove("on");syncMask()}
+function syncMask(){$("mask").classList.toggle("on",$("drawer").classList.contains("open")||$("msheet").classList.contains("on")||$("tsheet").classList.contains("on"))}
+$("mchip").onclick=()=>{const s=$("msheet");const w=s.classList.contains("on");closeAll();if(!w){s.classList.add("on");syncMask()}};
+$("toolBtn").onclick=()=>{const s=$("tsheet");const w=s.classList.contains("on");closeAll();if(!w){s.classList.add("on");syncMask()}};
+$("mask").onclick=closeAll;$("drawerBtn").onclick=()=>{$("drawer").classList.toggle("open");syncMask()};
+$("addBtn").onclick=e=>{e.stopPropagation();$("addmenu").classList.toggle("on")};
+document.addEventListener("click",e=>{if(!e.target.closest("#addmenu")&&!e.target.closest("#addBtn"))$("addmenu").classList.remove("on");
+ const c=e.target.closest(".conv");if(document.body.classList.contains("selecting")&&c){c.classList.toggle("sel");cnt()}});
+$("micBtn").onclick=()=>{$("micBtn").textContent=$("micBtn").textContent==="🎤"?" 松开发送":""};
+let busy=false;
+$("send").onclick=()=>{busy=!busy;const b=$("send");b.textContent=busy?"■":"➤";b.classList.toggle("stop",busy)};
+$("qdel").onclick=()=>$("queuebar").remove();
+document.querySelectorAll("#tabs a").forEach(a=>a.onclick=()=>{
+ document.querySelectorAll("#tabs a").forEach(x=>x.classList.remove("on"));a.classList.add("on");
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));$(a.dataset.p).classList.add("on");
+ $("pageTitle").textContent=a.textContent;$("composer").style.display=a.dataset.p==="p-chat"?"":"none";});
+const convs=()=>[...document.querySelectorAll(".conv")];
+function cnt(){$("selCnt").textContent="已选 "+convs().filter(c=>c.classList.contains("sel")).length}
+$("mng").onclick=()=>{document.body.classList.add("selecting");$("drawer").classList.add("open");syncMask();cnt()};
+$("selCancel").onclick=()=>{document.body.classList.remove("selecting");convs().forEach(c=>c.classList.remove("sel"));$("drawer").classList.remove("open");syncMask()};
+$("selAll").onclick=()=>{const all=convs().every(c=>c.classList.contains("sel"));convs().forEach(c=>c.classList.toggle("sel",!all));cnt()};
+$("delSel").onclick=()=>{const n=convs().filter(c=>c.classList.contains("sel")).length;if(!n)return;$("cfmTxt").textContent="删除 "+n+" 个会话？";$("cfm").classList.add("on")};
+$("cfmNo").onclick=()=>$("cfm").classList.remove("on");
+$("cfmYes").onclick=()=>{convs().filter(c=>c.classList.contains("sel")).forEach(c=>c.remove());$("cfm").classList.remove("on");document.body.classList.remove("selecting");$("drawer").classList.remove("open");syncMask()};
+function openSet(sec){closeAll();$("settings").classList.add("open");$("sub").classList.remove("open");
+ const sb=$("setbody");const el=sec&&$(sec);
+ sb.scrollTop=el?Math.max(0,el.offsetTop-sb.offsetTop-6):0;}
+$("setBack").onclick=()=>{$("settings").classList.remove("open");$("sub").classList.remove("open")};
+document.querySelectorAll("[data-set]").forEach(r=>r.onclick=()=>openSet(r.dataset.set));
+document.querySelectorAll("#setbody .switch,#tsheet .switch").forEach(s=>s.onclick=e=>{e.stopPropagation();s.classList.toggle("on")});
+document.querySelectorAll("#tsheet .lv span").forEach(v=>v.onclick=()=>{v.parentNode.querySelectorAll("span").forEach(x=>x.classList.remove("on"));v.classList.add("on")});
+$("q").oninput=e=>{const k=e.target.value.trim().toLowerCase();
+ document.querySelectorAll("#setbody .item").forEach(it=>{it.style.display=!k||it.textContent.toLowerCase().includes(k)?"":"none"});
+ document.querySelectorAll("#setbody .sec").forEach(s=>{let n=s.nextElementSibling,any=false;
+  while(n&&!n.classList.contains("sec")&&!n.classList.contains("foot")){if(n.style.display!=="none")any=true;n=n.nextElementSibling}s.style.display=any||!k?"":"none"});};
+</script>
+</body>
+</html>
