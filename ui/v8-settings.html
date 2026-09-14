@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hualuo RepoTool · 设置页 v8（全功能 + 大白话）</title>
+<style>
+:root{--bg:#f3f4f6;--card:#fff;--ink:#17181a;--sub:#7d8590;--line:#eceef2;--acc:#0a5cff;--ok:#16a34a;--warn:#f59e0b;--red:#e5484d}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:#e8eaee;font:15px/1.6 "ColorOS Sans","PingFang SC",sans-serif;color:var(--ink);display:flex;justify-content:center}
+.ph{width:393px;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;position:relative}
+header{display:flex;align-items:center;gap:12px;padding:16px 16px 10px;position:sticky;top:0;background:var(--bg);z-index:5}
+.back{width:38px;height:38px;border-radius:50%;border:none;background:var(--card);font-size:17px;box-shadow:0 1px 3px rgba(0,0,0,.07);cursor:pointer}
+header b{font-size:20px}
+.search{margin:4px 16px 10px;display:flex;align-items:center;gap:8px;background:var(--card);border-radius:16px;padding:10px 14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.search input{flex:1;border:none;outline:none;background:none;font-size:14px}
+main{flex:1;overflow-y:auto;padding:0 14px 30px}
+.sec{font-size:13px;color:var(--acc);font-weight:600;margin:16px 6px 8px}
+.item{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:18px;padding:13px 14px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.ic{width:38px;height:38px;border-radius:12px;background:#e9f0ff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.tx{flex:1;min-width:0}
+.tx .t{font-size:15px;font-weight:600}
+.tx .d{font-size:12px;color:var(--sub);margin-top:1px}
+.val{font-size:12px;color:var(--sub);font-family:monospace;max-width:96px;text-align:right}
+.chev{color:#c6ccd6;font-size:15px}
+.switch{width:42px;height:25px;border-radius:13px;background:#dfe3ea;position:relative;cursor:pointer;flex-shrink:0}
+.switch i{position:absolute;top:3px;left:3px;width:19px;height:19px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.switch.on{background:var(--acc)}.switch.on i{left:20px}
+.bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden;display:flex;margin:10px 0 6px}
+.bar i{display:block;height:100%}
+.foot{text-align:center;font-size:11px;color:#a8afba;padding:18px 0 8px}
+</style>
+</head>
+<body>
+<div class="ph">
+  <header><button class="back">←</button><b>设置</b></header>
+  <div class="search">🔍<input id="q" placeholder="搜设置，比如「代理」「备份」"></div>
+  <main id="list">
+
+    <div class="sec">AI 服务</div>
+    <div class="item"><span class="ic">☁️</span><span class="tx"><div class="t">提供商</div><div class="d">用哪家 AI、地址和密钥。密钥只存本机，不外发</div></span><span class="val">bai2 等 3 家</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🗨️</span><span class="tx"><div class="t">模型</div><div class="d">勾选哪些能用；上下文上限用模型真实值，不许手填冒充</div></span><span class="val">已启用 5</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🌐</span><span class="tx"><div class="t">代理</div><div class="d">网络不通时走 HTTP/SOCKS 转发，只影响 AI 请求</div></span><span class="val">未设置</span><span class="chev">›</span></div>
+
+    <div class="sec">对话</div>
+    <div class="item"><span class="ic">🧠</span><span class="tx"><div class="t">系统指令</div><div class="d">每次开聊前先交代的家规，比如「结论必须带证据」</div></span><span class="val">2 条</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🎛️</span><span class="tx"><div class="t">生成参数</div><div class="d">回答怎么写：温度（高=敢想，低=稳）、带多少历史</div></span><span class="val">temp 0.7</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">✏️</span><span class="tx"><div class="t">标题生成</div><div class="d">聊完自动给会话起名字，不用你自己想</div></span><span class="switch on"><i></i></span></div>
+    <div class="item"><span class="ic">✂️</span><span class="tx"><div class="t">历史裁剪</div><div class="d">上下文装不下时砍谁：按 token 裁，砍了什么必须在界面出声</div></span><span class="val">按 token</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">📝</span><span class="tx"><div class="t">草稿保存</div><div class="d">没发出去的话自动存，切会话回来还在</div></span><span class="switch on"><i></i></span></div>
+
+    <div class="sec">多模态</div>
+    <div class="item"><span class="ic">🖼️</span><span class="tx"><div class="t">图像转述</div><div class="d">让能看的模型把图说成文字，转给不能看的模型用</div></span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🎨</span><span class="tx"><div class="t">图像生成</div><div class="d">按你写的文字出图</div></span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🎤</span><span class="tx"><div class="t">语音输入</div><div class="d">说话代替打字，转成文字进输入框</div></span><span class="chev">›</span></div>
+
+    <div class="sec">工具</div>
+    <div class="item"><span class="ic">🔎</span><span class="tx"><div class="t">网页搜索</div><div class="d">让 AI 上网查实时资料，选搜索服务商</div></span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🔍</span><span class="tx"><div class="t">对话搜索</div><div class="d">翻以前聊过的内容，按关键词找</div></span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">⌨️</span><span class="tx"><div class="t">终端</div><div class="d">在手机上直接跑命令（沙盒里），能看能停</div></span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">⟨⟩</span><span class="tx"><div class="t">GitHub 工作台</div><div class="d">登录、看仓库、跑 CI、开 PR，全在 App 内完成</div></span><span class="val">xf8410</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">📤</span><span class="tx"><div class="t">文件投递</div><div class="d">手机文件传到 GitHub 仓：大文件自动切片、断了能续</div></span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🧾</span><span class="tx"><div class="t">二进制审计</div><div class="d">导入 APK/dat 等大文件查内容，只读不改原文件</div></span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🎰</span><span class="tx"><div class="t">赛马娘工作台</div><div class="d">从本机 18765 端口读游戏数据，只读门禁，不写游戏</div></span><span class="val">在线</span><span class="chev">›</span></div>
+
+    <div class="sec">自动化</div>
+    <div class="item"><span class="ic">⏰</span><span class="tx"><div class="t">定时任务</div><div class="d">到点自动让 AI 干活，每次开一个新会话执行</div></span><span class="val">2 启用</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🔁</span><span class="tx"><div class="t">会话循环</div><div class="d">隔一段时间自动接一句，长活挂机跑，有轮次上限</div></span><span class="val">1 运行中</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">👥</span><span class="tx"><div class="t">多智能体接力</div><div class="d">几个模型按顺序接龙写一条回复：一个主答、一个挑错</div></span><span class="chev">›</span></div>
+
+    <div class="sec">记忆与数据</div>
+    <div class="item"><span class="ic">💾</span><span class="tx"><div class="t">记忆</div><div class="d">AI 长期记住的东西和存的文件，这里能看能删</div></span><span class="val">2 个文件</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🗄️</span><span class="tx"><div class="t">数据控制</div><div class="d">全部对话导出成一个文件 / 从备份导入（合并不覆盖）</div></span><span class="chev">›</span></div>
+    <div class="item" style="flex-direction:column;align-items:stretch">
+      <div style="display:flex;align-items:center;gap:12px"><span class="ic">📊</span><span class="tx"><div class="t">存储占用</div><div class="d">对话和附件各占多少，一键清理缓存</div></span><span class="val">2.4 / 8.1 GB</span></div>
+      <div class="bar"><i style="width:24%;background:var(--acc)"></i><i style="width:4%;background:var(--warn)"></i><i style="width:2%;background:var(--red)"></i></div>
+      <div style="font-size:11px;color:var(--sub)">蓝=对话 1.9G · 黄=附件 0.5G · 红=缓存 0.1G。备份不加密（拍板 D-10）</div>
+    </div>
+
+    <div class="sec">我的</div>
+    <div class="item"><span class="ic">🔖</span><span class="tx"><div class="t">常用网站</div><div class="d">收藏的链接速开；跟 AI 说一句就能帮你存</div></span><span class="val">12 条</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">💡</span><span class="tx"><div class="t">待开发任务</div><div class="d">想要什么功能先记这，AI 实现一件勾一件</div></span><span class="val">3 待办</span><span class="chev">›</span></div>
+
+    <div class="sec">外观与通用</div>
+    <div class="item"><span class="ic">🎭</span><span class="tx"><div class="t">外观</div><div class="d">亮色/暗色/跟随系统，主色可换</div></span><span class="val">跟随系统</span><span class="chev">›</span></div>
+    <div class="item"><span class="ic">🈶</span><span class="tx"><div class="t">语言</div><div class="d">界面显示语言（说明文字用中文，代码里不留中文）</div></span><span class="val">简体中文</span><span class="chev">›</span></div>
+
+    <div class="sec">关于</div>
+    <div class="item"><span class="ic">ℹ️</span><span class="tx"><div class="t">关于</div><div class="d">版本 0.1.0 (1)（单源）· 检查更新 · 崩溃报告（本地留一份，启动只问一次）· 提 issue</div></span><span class="chev">›</span></div>
+    <div class="foot">Hualuo RepoTool · 本页文案即验收基准：每项一句大白话，不许出现「管理 XX」这种绕话</div>
+  </main>
+</div>
+<script>
+const $=q=>document.querySelector(q);
+document.getElementById("q").oninput=e=>{
+ const k=e.target.value.trim().toLowerCase();
+ document.querySelectorAll(".item").forEach(it=>{it.style.display=!k||it.textContent.toLowerCase().includes(k)?"":"none"});
+ document.querySelectorAll(".sec").forEach(s=>{let n=s.nextElementSibling,any=false;
+  while(n&&!n.classList.contains("sec")){if(n.style.display!=="none")any=true;n=n.nextElementSibling}s.style.display=any||!k?"":"none"});};
+document.querySelectorAll(".switch").forEach(s=>s.onclick=()=>s.classList.toggle("on"));
+</script>
+</body>
+</html>
